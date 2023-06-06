@@ -6,6 +6,7 @@ Changes:
 - Dependency update
 - Gemfile use HTTPS instead of HTTP
 - Convert README to Markdown
+- Lint code with default Rubocop config
 
 Known bug:
 

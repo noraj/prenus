@@ -1,14 +1,13 @@
 #!/usr/bin/env ruby
+# frozen_string_literal: true
 
-lib_dir = File.expand_path(File.join(File.dirname(__FILE__),'..'))
-unless $LOAD_PATH.include?(lib_dir)
-	$LOAD_PATH << lib_dir
-end
+lib_dir = File.expand_path(File.join(File.dirname(__FILE__), '..'))
+$LOAD_PATH << lib_dir unless $LOAD_PATH.include?(lib_dir)
 
-$root_dir = File.expand_path(File.join(File.dirname(__FILE__),'..'))
+$root_dir = File.expand_path(File.join(File.dirname(__FILE__), '..'))
 
-#require some goodies
-#require 'ruby-nessus'
+# require some goodies
+# require 'ruby-nessus'
 
 require 'fileutils'
 require 'optparse'
@@ -18,142 +17,146 @@ require 'lib/output'
 require 'lib/input'
 require 'lib/gemcache/ruby-nessus/ruby-nessus'
 
-#Versioning and .. those things
+# Versioning and .. those things
 $verstring = "Version 0.0.12 - 8th of October, 2013 - Created by Christian \"xntrik\" Frichot.\n\n"
 $verstring += "Copyright 2013 Christian Frichot\n\n"
 $verstring += "See LICENSE.txt for more details\n"
 
 class OptsConsole
-	def self.parse(args)
-		options = {}
+  def self.parse(args)
+    options = {}
 
-		opts = OptionParser.new do |opts|
-			opts.banner = "Usage: prenus <options> [INPUT]"
+    opts = OptionParser.new do |opts|
+      opts.banner = 'Usage: prenus <options> [INPUT]'
 
-			opts.separator ""
-			opts.separator "Specific Options:"
+      opts.separator ''
+      opts.separator 'Specific Options:'
 
-			opts.on('-h', '--help', 'Display this screen') do
-				puts opts
-				exit
-			end
+      opts.on('-h', '--help', 'Display this screen') do
+        puts opts
+        exit
+      end
 
-			opts.on('-c', '--config FILE', 'Load a YAML formatted config file') do |config|
-				options[:configfile] = config
-			end
+      opts.on('-c', '--config FILE', 'Load a YAML formatted config file') do |config|
+        options[:configfile] = config
+      end
 
-			# input option
-			# opts.on('-i', '--input FILE', "Or pass in a search option, such as '*.nessus' <- needs single quotes") do |input|
-			# 	options[:input] = input
-			# end
+      # input option
+      # opts.on('-i', '--input FILE', "Or pass in a search option, such as '*.nessus' <- needs single quotes") do |input|
+      # 	options[:input] = input
+      # end
 
-			# output dir
-			opts.on('-o', '--ouput DIR/FILE', "Defaults to '.'") do |output|
-				#options[:outputdir] = output
-				options[:output] = output
-			end
+      # output dir
+      opts.on('-o', '--ouput DIR/FILE', "Defaults to '.'") do |output|
+        # options[:outputdir] = output
+        options[:output] = output
+      end
 
-			# output type
-			opts.on('-t', '--type TYPE', "Select: xls, html, glow, circos or host. Defaults to html") do |type|
-				case type
-				when "html"
-					options[:type] = "html"
-				when "xls"
-					options[:type] = "xls"
-				when "glow"
-					options[:type] = "glow"
-				when "circos"
-					options[:type] = "circos"
-				when "host"
-					options[:type] = "host"
-				else
-					options[:type] = "html"
-				end
-			end
+      # output type
+      opts.on('-t', '--type TYPE', 'Select: xls, html, glow, circos or host. Defaults to html') do |type|
+        options[:type] = case type
+                         when 'html'
+                           'html'
+                         when 'xls'
+                           'xls'
+                         when 'glow'
+                           'glow'
+                         when 'circos'
+                           'circos'
+                         when 'host'
+                           'host'
+                         else
+                           'html'
+                         end
+      end
 
-			# optional HTML content in a file to be inserted into the header
-			opts.on('--header-file FILE',"Optional HTML FILE to be inserted into the top of the index.html file when using HTML output") do |indexfile|
-				options[:indexfile] = indexfile
-			end
+      # optional HTML content in a file to be inserted into the header
+      opts.on('--header-file FILE',
+              'Optional HTML FILE to be inserted into the top of the index.html file when using HTML output') do |indexfile|
+        options[:indexfile] = indexfile
+      end
 
-			# level - how deep to go on some of the inputs
-			opts.on('-s', '--severity LEVEL', "Defaults to 3 for High -> Critical. For large datasets 4 is saner") do |sev|
-				case sev.to_i
-				when 0
-					options[:severity] = 0
-				when 1
-					options[:severity] = 1
-				when 2
-					options[:severity] = 2
-				when 3
-					options[:severity] = 3
-				when 4
-					options[:severity] = 4
-				else
-					options[:severity] = 3
-				end
-			end
+      # level - how deep to go on some of the inputs
+      opts.on('-s', '--severity LEVEL', 'Defaults to 3 for High -> Critical. For large datasets 4 is saner') do |sev|
+        options[:severity] = case sev.to_i
+                             when 0
+                               0
+                             when 1
+                               1
+                             when 2
+                               2
+                             when 3
+                               3
+                             when 4
+                               4
+                             else
+                               3
+                             end
+      end
 
-			#filter - this is used for some of the outputs - to filter the output ... using MAGIC
-			opts.on('-f','--filter FILTER', "Only show these Nessus IDs. For multiple separate with commas 12345,23232,21212") do |filter|
-				options[:filter] = filter.to_s.split(",")
-			end
+      # filter - this is used for some of the outputs - to filter the output ... using MAGIC
+      opts.on('-f', '--filter FILTER',
+              'Only show these Nessus IDs. For multiple separate with commas 12345,23232,21212') do |filter|
+        options[:filter] = filter.to_s.split(',')
+      end
 
-			# print debug stuff?
-			opts.on('-d', '--debug', "Displays stats and other debugging") do |debug|
-				options[:debug] = true
-			end
+      # print debug stuff?
+      opts.on('-d', '--debug', 'Displays stats and other debugging') do |_debug|
+        options[:debug] = true
+      end
 
-			#yawn
-			opts.on('-v', '--version', "Shows the version") do |version|
-				options[:version] = true
-			end
-		end
+      # yawn
+      opts.on('-v', '--version', 'Shows the version') do |_version|
+        options[:version] = true
+      end
+    end
 
-		begin
-			opts.parse!(args)
-			if ARGV.count == 0 and options[:version].nil?
-				puts
-				puts "** Please specify input files"
-				puts
-				puts opts
-				exit
-			end
+    begin
+      opts.parse!(args)
+      if ARGV.count.zero? && options[:version].nil?
+        puts
+        puts '** Please specify input files'
+        puts
+        puts opts
+        exit
+      end
 
-			if options[:version]
-				print $verstring
-				exit
-			end
+      if options[:version]
+        print $verstring
+        exit
+      end
 
-			if options[:debug] and options[:output].nil?
-				print "** can't debug whilst printing out to stdout\n"
-				print "** try without the -d option, or by specifying an output file with -o\n"
-				exit
-			end
+      if options[:debug] && options[:output].nil?
+        print "** can't debug whilst printing out to stdout\n"
+        print "** try without the -d option, or by specifying an output file with -o\n"
+        exit
+      end
 
-			if options[:type] == "html" and options[:output].nil?
-				print "** need a folder name when generating html\n"
-				print "** try with the -o option\n"
-				exit
-			end
+      if (options[:type] == 'html') && options[:output].nil?
+        print "** need a folder name when generating html\n"
+        print "** try with the -o option\n"
+        exit
+      end
 
-			#options[:outputdir] = "." if options[:outputdir].nil? #Default output dir
-			options[:type] = "html" if options[:type].nil?   #Default output type
-			options[:severity] = 3 if options[:severity].nil? #Default severity level
-			options[:input] = ARGV # remaining command line options are files
+      # options[:outputdir] = "." if options[:outputdir].nil? #Default output dir
+      options[:type] = 'html' if options[:type].nil? # Default output type
+      options[:severity] = 3 if options[:severity].nil? # Default severity level
+      options[:input] = ARGV # remaining command line options are files
+    rescue OptionParser::InvalidOption
+      puts 'Invalid option, try -h for usage'
+      exit
+    end
 
-		rescue OptionParser::InvalidOption
-			puts "Invalid option, try -h for usage"
-			exit
-		end
-
-		options
-	end
+    options
+  end
 end
 
 options = OptsConsole.parse(ARGV)
 
-options[:override] = YAML.load_file(options[:configfile])['prenus']['input']['override'] unless options[:configfile].nil?
+unless options[:configfile].nil?
+  options[:override] =
+    YAML.load_file(options[:configfile])['prenus']['input']['override']
+end
 options[:skip] = YAML.load_file(options[:configfile])['prenus']['input']['skip'] unless options[:configfile].nil?
 
 # Process the input file(s) into two hashes
@@ -161,28 +164,27 @@ hosts, events = Prenus::Input::Nessusin.import_nessus_files(options)
 
 # Create an output object - depending on options - and run it
 case options[:type]
-when "html"
-	Prenus::Output::Htmlout.new(events,hosts,options).run
-when "xls"
-	Prenus::Output::Xlsout.new(events,hosts,options).run
-when "glow"
-	Prenus::Output::Afterglowout.new(events,hosts,options).run
-when "circos"
-	Prenus::Output::Circosout.new(events,hosts,options).run
-when "host"
-	Prenus::Output::Hostinfoout.new(events,hosts,options).run
+when 'html'
+  Prenus::Output::Htmlout.new(events, hosts, options).run
+when 'xls'
+  Prenus::Output::Xlsout.new(events, hosts, options).run
+when 'glow'
+  Prenus::Output::Afterglowout.new(events, hosts, options).run
+when 'circos'
+  Prenus::Output::Circosout.new(events, hosts, options).run
+when 'host'
+  Prenus::Output::Hostinfoout.new(events, hosts, options).run
 end
 
 # some debuggy / extra info stuff
 if options[:debug]
 
-	require 'pp'
-	pp events
-	pp hosts
-	pp options
+  pp events
+  pp hosts
+  pp options
 
-	puts "__STATS___"
+  puts '__STATS___'
 
-	puts "Number of hosts: " + hosts.count.to_s
-	puts "Number of vulns: " + events.count.to_s
+  puts "Number of hosts: #{hosts.count}"
+  puts "Number of vulns: #{events.count}"
 end

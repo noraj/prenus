@@ -1,55 +1,51 @@
+# frozen_string_literal: true
+
 module Prenus
-module Output
+  module Output
+    if RUBY_VERSION >= '3.2.0'
+      # version of ruby is >= 3.2.0, applying monkeypatch to File and Dir (see https://bugs.ruby-lang.org/issues/17391)
 
-if RUBY_VERSION >= '3.2.0'
-	# version of ruby is >= 3.2.0, applying monkeypatch to File and Dir (see https://bugs.ruby-lang.org/issues/17391)
+      class << File
+        alias exists? exist?
+      end
 
-  class << File
-    alias_method :exists?, :exist?
-  end
+      class << Dir
+        alias exists? exist?
+      end
 
-  class << Dir
-    alias_method :exists?, :exist?
-  end
+    end
 
-end
+    class Baseout
+      @events = {} 	# instance variable of all vulnerability events
+      @hosts = {}  	# instance variable of all the hosts
+      @options = {}	# instance variable of the options hash, this inclues all the configuration settings @see Htmlout#initialize
+      @oFile = nil # the output file
 
-	class Baseout
+      #
+      # This is the super-class that all output classes should inherent
+      #  @see Htmlout#initialize
+      #
+      def initialize(events, hosts, options)
+        @events = events
+        @hosts = hosts
+        @options = options
 
-		@events = {} 	#instance variable of all vulnerability events
-		@hosts = {}  	#instance variable of all the hosts
-		@options = {}	#instance variable of the options hash, this inclues all the configuration settings @see Htmlout#initialize
-		@oFile = nil    #the output file
+        if @options[:type] == 'html' # Therefore, the output should be a folder name, not a file
 
-		#
-		# This is the super-class that all output classes should inherent
-		#  @see Htmlout#initialize
-		#
-		def initialize(events, hosts, options)
-			@events = events
-			@hosts = hosts
-			@options = options
+          @options[:output] = '.' if @options[:output].nil?
 
-			if @options[:type] == "html" #Therefore, the output should be a folder name, not a file
+          # Check if the output dir exists
+          Dir.mkdir(@options[:output]) unless File.exist?(@options[:output])
+        else
+          @oFile = File.new(@options[:output], 'w') unless @options[:output].nil?
+          @oFile = $stdout if @oFile.nil?
+        end
+      end
 
-				@options[:output] = "." if @options[:output].nil?
-
-				#Check if the output dir exists
-				Dir.mkdir(@options[:output]) unless File.exists?(@options[:output])
-			else
-				@oFile = File.new(@options[:output],'w') unless @options[:output].nil?
-				@oFile = STDOUT if @oFile.nil?
-			end
-
-		end
-
-		#
-		# All inherented classes should implement a run method
-		#   @see Htmlout#run
-		#
-		def run
-
-		end
-	end
-
-end end
+      #
+      # All inherented classes should implement a run method
+      #   @see Htmlout#run
+      #
+      def run; end
+    end
+  end end

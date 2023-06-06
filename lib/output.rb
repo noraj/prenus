@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'lib/output/output'
 require 'lib/output/htmlout'
 require 'lib/output/xlsout'

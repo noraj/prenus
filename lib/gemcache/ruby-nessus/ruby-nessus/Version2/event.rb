@@ -1,10 +1,10 @@
+# frozen_string_literal: true
+
 require 'lib/gemcache/ruby-nessus/ruby-nessus/Version2/port'
 
 module Nessus
   module Version2
-
     class Event
-
       def initialize(event)
         @event = event
       end
@@ -48,7 +48,7 @@ module Nessus
       #    Return true if the event is informational.
       #
       def informational?
-        severity == 0
+        severity.zero?
       end
 
       #
@@ -56,7 +56,7 @@ module Nessus
       #
       # @return [Boolean]
       #   Return true if the event is low severity.
-      # 
+      #
       def low?
         severity == 1
       end
@@ -133,12 +133,12 @@ module Nessus
         s = @event.at('@pluginName').inner_text
 
         @plugin_name ||= if s.empty?
-          false
-        else
-          @event.at('@pluginName').inner_text
-        end
+                           false
+                         else
+                           @event.at('@pluginName').inner_text
+                         end
 
-        return @plugin_name
+        @plugin_name
       end
       alias name plugin_name
 
@@ -150,10 +150,10 @@ module Nessus
       #
       def synopsis
         @synopsis ||= if @event.at('synopsis')
-          @event.at('synopsis').inner_text
-        else
-          false
-        end
+                        @event.at('synopsis').inner_text
+                      else
+                        false
+                      end
       end
 
       #
@@ -164,10 +164,10 @@ module Nessus
       #
       def description
         @description ||= if @event.at('description')
-          @event.at('description').inner_text
-        else
-          false
-        end
+                           @event.at('description').inner_text
+                         else
+                           false
+                         end
       end
 
       #
@@ -178,10 +178,10 @@ module Nessus
       #
       def solution
         @solution ||= if @event.at('solution')
-          @event.at('solution').inner_text
-        else
-          false
-        end
+                        @event.at('solution').inner_text
+                      else
+                        false
+                      end
       end
 
       #
@@ -192,10 +192,10 @@ module Nessus
       #
       def risk
         @risk_factor ||= if @event.at('risk_factor')
-          @event.at('risk_factor').inner_text
-        else
-          false
-        end
+                           @event.at('risk_factor').inner_text
+                         else
+                           false
+                         end
       end
 
       #
@@ -206,10 +206,10 @@ module Nessus
       #
       def output
         @plugin_output ||= if @event.at('plugin_output')
-          @event.at('plugin_output').inner_text
-        else
-          false
-        end
+                             @event.at('plugin_output').inner_text
+                           else
+                             false
+                           end
       end
       alias data output
       alias plugin_output output
@@ -222,10 +222,10 @@ module Nessus
       #
       def version
         @plugin_version ||= if @event.at('plugin_version')
-          @event.at('plugin_version').inner_text
-        else
-          false
-        end
+                              @event.at('plugin_version').inner_text
+                            else
+                              false
+                            end
       end
       alias plugin_version version
 
@@ -238,7 +238,7 @@ module Nessus
       def see_also
         unless @see_also
           @see_also = []
-          @event.xpath("see_also").each do |see_also|
+          @event.xpath('see_also').each do |see_also|
             @see_also << see_also.inner_text
           end
         end
@@ -256,10 +256,11 @@ module Nessus
       #
       def patch_publication_date
         @patch_publication_date ||= if @event.at('patch_publication_date')
-          DateTime.strptime(@event.at('patch_publication_date').inner_text, fmt='%Y/%m/%d')
-        else
-          false
-        end
+                                      DateTime.strptime(@event.at('patch_publication_date').inner_text,
+                                                        fmt = '%Y/%m/%d')
+                                    else
+                                      false
+                                    end
       end
 
       #
@@ -270,12 +271,12 @@ module Nessus
       #
       def cvss_base_score
         @cvss_base_score ||= if @event.at('cvss_base_score')
-          @event.at('cvss_base_score').inner_text.to_f
-        else
-          false
-        end
+                               @event.at('cvss_base_score').inner_text.to_f
+                             else
+                               false
+                             end
       end
-      
+
       #
       # Return the event cve.
       #
@@ -284,10 +285,10 @@ module Nessus
       #
       def cve
         @cve ||= if @event.at('cve')
-          @event.at('cve').inner_text
-        else
-          false
-        end
+                   @event.at('cve').inner_text
+                 else
+                   false
+                 end
       end
 
       #
@@ -298,10 +299,10 @@ module Nessus
       #
       def bid
         @bid ||= if @event.at('bid')
-          @event.at('bid').inner_text.to_i
-        else
-          false
-        end
+                   @event.at('bid').inner_text.to_i
+                 else
+                   false
+                 end
       end
 
       #
@@ -313,7 +314,7 @@ module Nessus
       def xref
         unless @xref
           @xref = []
-          @event.xpath("xref").each do |xref|
+          @event.xpath('xref').each do |xref|
             @xref << xref.inner_text
           end
         end
@@ -328,14 +329,11 @@ module Nessus
       #
       def cvss_vector
         @cvss_vector ||= if @event.at('cvss_vector')
-          @event.at('cvss_vector').inner_text
-        else
-          false
-        end
+                           @event.at('cvss_vector').inner_text
+                         else
+                           false
+                         end
       end
-
     end
-
   end
-
 end

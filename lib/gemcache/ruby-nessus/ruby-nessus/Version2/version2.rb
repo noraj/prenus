@@ -1,16 +1,15 @@
+# frozen_string_literal: true
+
 require 'lib/gemcache/ruby-nessus/ruby-nessus/Version2/host'
 require 'lib/gemcache/ruby-nessus/ruby-nessus/Version2/event'
 
 module Nessus
-  
   # .Nessus Version 2 Schema
   module Version2
-
     # File to parse
     attr_reader :file
 
     class XML
-
       include Enumerable
 
       #
@@ -29,14 +28,13 @@ module Nessus
       #
       def initialize(xml)
         @xml = xml
-        raise "Error: Not A Version 2.0 .Nessus file." unless @xml.at('NessusClientData_v2')
+        raise 'Error: Not A Version 2.0 .Nessus file.' unless @xml.at('NessusClientData_v2')
       end
-      
-      
+
       def version
         2
       end
-      
+
       #
       # Return the nessus report title.
       #
@@ -57,7 +55,7 @@ module Nessus
       #   The Nessus Scan Policy Name
       #
       def policy_title
-        @policy_name ||= @xml.at("//Policy/policyName").inner_text
+        @policy_name ||= @xml.at('//Policy/policyName').inner_text
       end
 
       #
@@ -67,7 +65,7 @@ module Nessus
       #   The Nessus Scan Policy Comments
       #
       def policy_notes
-        @policy_notes ||= @xml.at("//Policy/policyComments").inner_text
+        @policy_notes ||= @xml.at('//Policy/policyComments').inner_text
       end
 
       #
@@ -84,9 +82,9 @@ module Nessus
       #
       def each_host(&block)
         hosts = []
-        @xml.xpath("//ReportHost").each do |host|
+        @xml.xpath('//ReportHost').each do |host|
           hosts << host['name'] if host['name']
-          block.call(Host.new(host)) if block
+          block&.call(Host.new(host))
         end
         hosts
       end
@@ -98,7 +96,7 @@ module Nessus
       #   The Hosts of the scan.
       #
       def hosts
-        Enumerator.new(self,:each_host).to_a
+        Enumerator.new(self, :each_host).to_a
       end
 
       #
@@ -123,14 +121,14 @@ module Nessus
       #   scan.unique_ports #=> 234
       #
       def unique_ports
-        unless @unique_ports
-          @unique_ports = []
-          @xml.xpath("//ReportItem").each do |port|
-            @unique_ports << port['port']
-          end
-          @unique_ports.uniq!
-          @unique_ports.sort!
+        return if @unique_ports
+
+        @unique_ports = []
+        @xml.xpath('//ReportItem').each do |port|
+          @unique_ports << port['port']
         end
+        @unique_ports.uniq!
+        @unique_ports.sort!
       end
 
       #
@@ -271,18 +269,16 @@ module Nessus
       # @example
       #   scan.event_percentage_for("low", true) #=> 11%
       #
-      def event_percentage_for(type, round_percentage=false)
+      def event_percentage_for(type, round_percentage = false)
         @sc ||= count_stats
-        if %W(high medium low tcp udp icmp all).include?(type)
-          calc = ((@sc[:"#{type}"].to_f / (@sc[:all].to_f)) * 100)
-          if round_percentage
-            return "#{calc.round}"
-          else
-            return "#{calc}"
-          end
-        else
+        unless %w[high medium low tcp udp icmp all].include?(type)
           raise "Error: #{type} is not an acceptable severity. Possible options include: all, tdp, udp, icmp, high, medium and low."
         end
+
+        calc = ((@sc[:"#{type}"].to_f / @sc[:all]) * 100)
+        return calc.round.to_s if round_percentage
+
+        calc.to_s
       end
 
       #
@@ -302,62 +298,68 @@ module Nessus
       #
       def find_by_hostname(hostname, &block)
         raise "Error: hostname can't be blank." if hostname.blank?
+
         @xml.xpath('//ReportHost').each do |host|
           next unless host['name'].match(hostname)
-          block.call(Host.new(host)) if block
+
+          block&.call(Host.new(host))
         end
       end
 
       private
 
-        #
-        # Calculates an event hash of totals for severity counts.
-        #
-        # @return [Hash]
-        #   The Event Totals For Severity
-        #
-        def count_stats
-          unless @count
-            @count = {}
-            @open_ports, @tcp, @udp, @icmp, @informational, @low, @medium, @high = 0,0,0,0,0,0,0,0
+      #
+      # Calculates an event hash of totals for severity counts.
+      #
+      # @return [Hash]
+      #   The Event Totals For Severity
+      #
+      def count_stats
+        unless @count
+          @count = {}
+          @open_ports = 0
+          @tcp = 0
+          @udp = 0
+          @icmp = 0
+          @informational = 0
+          @low = 0
+          @medium = 0
+          @high = 0
 
-            @xml.xpath("//ReportItem").each do |s|
-              case s['severity'].to_i
-                when 0
-                  @informational += 1
-                when 1
-                  @low += 1
-                when 2
-                  @medium += 1
-                when 3
-                  @high += 1
-              end
-              
-              unless s['severity'].to_i == 0
-                @tcp += 1 if s['protocol'] == 'tcp'
-                @udp += 1 if s['protocol'] == 'udp'
-                @icmp += 1 if s['protocol'] == 'icmp'
-              end
-              
-              @open_ports += 1 if s['port'].to_i != 0
+          @xml.xpath('//ReportItem').each do |s|
+            case s['severity'].to_i
+            when 0
+              @informational += 1
+            when 1
+              @low += 1
+            when 2
+              @medium += 1
+            when 3
+              @high += 1
             end
 
-            @count = {:open_ports => @open_ports,
-                      :tcp => @tcp,
-                      :udp => @udp,
-                      :icmp => @icmp,
-                      :informational => @informational,
-                      :low => @low,
-                      :medium => @medium,
-                      :high => @high,
-                      :all => (@low + @medium + @high)}
+            unless s['severity'].to_i.zero?
+              @tcp += 1 if s['protocol'] == 'tcp'
+              @udp += 1 if s['protocol'] == 'udp'
+              @icmp += 1 if s['protocol'] == 'icmp'
+            end
+
+            @open_ports += 1 if s['port'].to_i != 0
           end
 
-          return @count
+          @count = { open_ports: @open_ports,
+                     tcp: @tcp,
+                     udp: @udp,
+                     icmp: @icmp,
+                     informational: @informational,
+                     low: @low,
+                     medium: @medium,
+                     high: @high,
+                     all: (@low + @medium + @high) }
         end
 
+        @count
+      end
     end
-
-
   end
 end

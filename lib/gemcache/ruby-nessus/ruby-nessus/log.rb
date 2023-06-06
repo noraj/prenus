@@ -1,82 +1,83 @@
+# frozen_string_literal: true
+
 require 'rainbow'
 module Nessus
-  
   class Log
-    
     #
     # Formatting
     #
-    def self.it(msg=nil)
-      STDERR.puts "#{msg}"
+    def self.it(msg = nil)
+      warn msg.to_s
     end
-    
-    def self.it!(msg=nil)
-      STDERR.puts "\t#{msg}"
+
+    def self.it!(msg = nil)
+      warn "\t#{msg}"
     end
-    
+
     def self.break
-      STDERR.puts "\t"
-      STDERR.puts ""
+      warn "\t"
+      warn ''
     end
-    
+
     def self.end
-      STDERR.puts "\n\n"
+      warn "\n\n"
     end
-    
+
     #
     # Headers
     #
-    def self.h1(title, msg=nil)
-      STDERR.puts "-> #{title}: ".foreground(:green).bright + "#{msg}"
+    def self.h1(title, msg = nil)
+      warn "-> #{title}: ".foreground(:green).bright + msg.to_s
     end
-    
-    def self.h2(title, msg=nil)
-      STDERR.puts "\t#{title}: ".foreground(:blue).bright + "#{msg}"
+
+    def self.h2(title, msg = nil)
+      warn "\t#{title}: ".foreground(:blue).bright + msg.to_s
     end
-    
-    def self.h3(title, msg=nil)
-      STDERR.puts "\t#{title}: " + "#{msg}".foreground(:blue).underline
+
+    def self.h3(title, msg = nil)
+      warn "\t#{title}: " + msg.to_s.foreground(:blue).underline
     end
-    
-    def self.h4(msg=nil)
-      STDERR.puts "\t\t- #{msg}"
+
+    def self.h4(msg = nil)
+      warn "\t\t- #{msg}"
     end
-    
-    def self.h5(title, msg=nil)
-      STDERR.puts "\t\t- #{title}: #{msg}"
+
+    def self.h5(title, msg = nil)
+      warn "\t\t- #{title}: #{msg}"
     end
-    
+
     #
     # Errors
     #
-    def self.error(msg=nil)
-      STDERR.puts "ERROR: ".foreground(:red).bright + "#{msg}"
+    def self.error(msg = nil)
+      warn 'ERROR: '.foreground(:red).bright + msg.to_s
     end
-    
-    def self.warn(msg=nil)
-      STDERR.puts "WARNING: ".foreground(:yellow).bright + "#{msg}"
+
+    def self.warn(msg = nil)
+      warn 'WARNING: '.foreground(:yellow).bright + msg.to_s
     end
-    
-    def self.info(msg=nil)
-      STDERR.puts "INFO: ".foreground(:green).bright + "#{msg}"
-    end 
-    
+
+    def self.info(msg = nil)
+      warn 'INFO: '.foreground(:green).bright + msg.to_s
+    end
+
     #
     # Event Severities
     #
-    def self.informational(title, msg=nil)
-      STDERR.puts "\t#{title}: ".foreground(:magenta).bright + "#{msg}"
+    def self.informational(title, msg = nil)
+      warn "\t#{title}: ".foreground(:magenta).bright + msg.to_s
     end
-    def self.low(title, msg=nil)
-      STDERR.puts "\t#{title}: ".foreground(:green) + "#{msg}"
+
+    def self.low(title, msg = nil)
+      warn "\t#{title}: ".foreground(:green) + msg.to_s
     end
-    def self.medium(title, msg=nil)
-      STDERR.puts "\t#{title}: ".foreground(:yellow).bright + "#{msg}"
+
+    def self.medium(title, msg = nil)
+      warn "\t#{title}: ".foreground(:yellow).bright + msg.to_s
     end
-    def self.high(title, msg=nil)
-      STDERR.puts "\t#{title}: ".foreground(:red).bright + "#{msg}"
+
+    def self.high(title, msg = nil)
+      warn "\t#{title}: ".foreground(:red).bright + msg.to_s
     end
-    
   end
-  
 end
