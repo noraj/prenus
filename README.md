@@ -7,6 +7,7 @@ Changes:
 - Gemfile use HTTPS instead of HTTP
 - Convert README to Markdown
 - Lint code with default Rubocop config
+- Fix the file structure and have proper `require`
 
 Known bug:
 
@@ -31,9 +32,15 @@ output of a few different formats, including:
 
 Install the Prenus gem:
 
-```
+```bash
 git clone https://github.com/noraj/prenus.git && cd prenus
+
+# to run without install
 bundle install
+
+# install globally
+gem build prenus.gemspec
+gem install prenus-*.gem
 ```
 
 ## Usage
@@ -42,8 +49,10 @@ bundle install
     they're version 2 files, not version 1)
 * Cd into the folder where the files are
 * Run Prenus:
-    * `bundle exec ./bin/prenus -t html -o output_folder ../my_export.nessus`
-    * `bundle exec ./bin/prenus -t host -o /tmp/report.host ../my_export.nessus`
+    * If installed globally
+        * `prenus -t html -o output_folder ../my_export.nessus`
+    * Run without install
+        * `bundle exec ruby -Ilib -rprenus bin/prenus -t host -o /tmp/report.host ../my_export.nessus`
 
 ## Command Line Options
 

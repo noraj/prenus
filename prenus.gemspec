@@ -1,23 +1,23 @@
 # frozen_string_literal: true
 
-$LOAD_PATH.unshift File.expand_path('lib', __dir__)
+# require_relative 'lib/prenus'
+
 Gem::Specification.new do |s|
   s.name = 'prenus'
-  s.version = '0.0.12'
-  s.authors = ['Christian Frichot']
+  s.version = '0.0.13'
+  s.platform = Gem::Platform::RUBY
+  s.authors = ['Christian Frichot', 'Alexandre ZANNI']
   s.date = '2013-10-08'
   s.description = 'Pretty Nessus = Prenus'
-  s.email = 'xntrik@gmail.com'
-  s.extra_rdoc_files = [
-    'LICENSE.txt',
-    'README.rdoc'
-  ]
-  s.files = Dir['{lib}/**/*'] + %w[LICENSE.txt README.rdoc]
-  s.executables = 'prenus'
-  s.homepage = 'http://github.com/AsteriskLabs/prenus'
-  s.licenses = ['MIT']
-  s.require_paths = ['lib']
   s.summary = 'Prenus - The Pretty Nessus Parser'
+  s.email = 'xntrik@gmail.com'
+  s.licenses = ['MIT']
+  s.homepage = 'http://github.com/noraj/prenus'
+
+  s.files = Dir['bin/*'] + Dir['lib/**/*'] + %w[LICENSE.txt README.md]
+  s.bindir = 'bin'
+  s.executables = s.files.grep(%r{^bin/}) { |f| File.basename(f) }
+  s.require_paths = ['lib']
 
   s.required_ruby_version = '>= 3.0.0'
 

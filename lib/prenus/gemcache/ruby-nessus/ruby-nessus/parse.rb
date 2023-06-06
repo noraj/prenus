@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-require 'lib/gemcache/ruby-nessus/ruby-nessus/log'
-require 'lib/gemcache/ruby-nessus/ruby-nessus/Version1/version1'
-require 'lib/gemcache/ruby-nessus/ruby-nessus/Version2/version2'
+require 'prenus/gemcache/ruby-nessus/ruby-nessus/log'
+require 'prenus/gemcache/ruby-nessus/ruby-nessus/Version1/version1'
+require 'prenus/gemcache/ruby-nessus/ruby-nessus/Version2/version2'
 
 require 'nokogiri'
 require 'date'

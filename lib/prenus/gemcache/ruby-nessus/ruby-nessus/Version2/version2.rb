@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-require 'lib/gemcache/ruby-nessus/ruby-nessus/Version2/host'
-require 'lib/gemcache/ruby-nessus/ruby-nessus/Version2/event'
+require 'prenus/gemcache/ruby-nessus/ruby-nessus/Version2/host'
+require 'prenus/gemcache/ruby-nessus/ruby-nessus/Version2/event'
 
 module Nessus
   # .Nessus Version 2 Schema

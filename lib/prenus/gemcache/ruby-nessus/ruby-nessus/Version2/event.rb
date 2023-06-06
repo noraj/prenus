@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'lib/gemcache/ruby-nessus/ruby-nessus/Version2/port'
+require 'prenus/gemcache/ruby-nessus/ruby-nessus/Version2/port'
 
 module Nessus
   module Version2

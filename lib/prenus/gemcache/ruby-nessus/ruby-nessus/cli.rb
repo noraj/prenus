@@ -1,8 +1,7 @@
 # frozen_string_literal: true
 
-require 'rubygems'
-require 'lib/gemcache/ruby-nessus/ruby-nessus/nessus'
-require 'lib/gemcache/ruby-nessus/ruby-nessus/log'
+require 'prenus/gemcache/ruby-nessus/ruby-nessus/nessus'
+require 'prenus/gemcache/ruby-nessus/ruby-nessus/log'
 require 'optparse'
 
 module Nessus

@@ -1,10 +1,7 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
-lib_dir = File.expand_path(File.join(File.dirname(__FILE__), '..'))
-$LOAD_PATH << lib_dir unless $LOAD_PATH.include?(lib_dir)
-
-$root_dir = File.expand_path(File.join(File.dirname(__FILE__), '..'))
+require 'prenus'
 
 # require some goodies
 # require 'ruby-nessus'
@@ -13,9 +10,7 @@ require 'fileutils'
 require 'optparse'
 require 'yaml'
 
-require 'lib/output'
-require 'lib/input'
-require 'lib/gemcache/ruby-nessus/ruby-nessus'
+require 'prenus/gemcache/ruby-nessus/ruby-nessus'
 
 # Versioning and .. those things
 $verstring = "Version 0.0.12 - 8th of October, 2013 - Created by Christian \"xntrik\" Frichot.\n\n"
