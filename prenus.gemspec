@@ -18,14 +18,8 @@ Gem::Specification.new do |s|
   s.require_paths = ["lib"]
   s.summary = "Prenus - The Pretty Nessus Parser"
 
-  s.required_ruby_version = '>= 1.9.2'
-  s.required_rubygems_version = '>= 1.8.0'
+  s.required_ruby_version = '>= 3.0.0'
 
-  {
-    'rainbow' => '~> 1.1.0',
-    'nokogiri' => '~> 1.6.0'
-  }.each do |lib, version|
-    s.add_runtime_dependency(lib, *version)
-  end
-  
+  s.add_runtime_dependency('rainbow', '~> 3.1', '>= 3.1.1')
+  s.add_runtime_dependency('nokogiri', '~> 1.15', '>= 1.15.2')  
 end
